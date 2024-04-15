@@ -3,7 +3,7 @@
   <div class="container">
     <Balance :total="total"/>
     <IncomeExpense :income="+income" :expenses="+expenses"/>
-    <TransactionList :transactions="transactions"/>
+    <TransactionList :transactions="transactions" @btnDelete="handlerDelet"/>
     <AddTransaction @transactionSubmitted="handlerSubmitted"/>
   </div>
 </template>
@@ -15,13 +15,20 @@
   import TransactionList from './components/TransactionList.vue';
   import AddTransaction from './components/AddTransaction.vue';
 
-  import { ref, computed } from 'vue'
+  import { useToast } from 'vue-toastification';
+  import { ref, computed, onMounted } from 'vue'
 
-    const transactions = ref([
-        { id: 1, Text: 'Ifood', amount: -23.5 },
-        { id: 2, Text: 'Vale', amount: 250 },
-        { id: 3, Text: 'Avon', amount: -30 }
-    ])
+  const toast = useToast();
+
+    const transactions = ref([]);
+
+    // add localstorage
+    onMounted(() => {
+      const savedTransactions = JSON.parse(localStorage.getItem('transactions'));
+      if(savedTransactions){
+        transactions.value = savedTransactions;
+      }
+    });
 
     // get total
     const total = computed(() => {
@@ -52,14 +59,28 @@
     const handlerSubmitted = (transactionData) => {
       transactions.value.push({
         id: generateUniqueId(),
-        text: transactionData.text, 
+        Text: transactionData.text, 
         amount: transactionData.price
-      })
+      });
+      saveTransactionsLocalStorage();
+      toast.success('Transação adicionada')
     }
 
     // generate id
     const generateUniqueId = () => {
-      return Math.floor(Math.random() * )
+      return Math.floor(Math.random() * 1000)
+    }
+
+    // delete transaction
+    const handlerDelet = (id) => {
+      transactions.value = transactions.value.filter((transaction) => transaction.id !== id);
+      saveTransactionsLocalStorage();
+      toast.success('Transação deletada')
+    };
+
+    // save to localstorage
+    const saveTransactionsLocalStorage = () => {
+      localStorage.setItem('transactions', JSON.stringify(transactions.value) || []);
     }
 
 </script>

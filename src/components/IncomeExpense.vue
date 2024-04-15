@@ -6,7 +6,7 @@
         </div>
         <div>
             <h4>Dívida</h4>
-            <p id="money-minus" class="money minus">-R${{ expenses }}</p>
+            <p id="money-minus" class="money minus">R${{ expenses }}</p>
         </div>
     </div>
 </template>
